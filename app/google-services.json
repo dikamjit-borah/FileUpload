@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1091656542476",
+    "project_id": "fileupload-8a472",
+    "storage_bucket": "fileupload-8a472.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1091656542476:android:dd334007585e924e16c129",
+        "android_client_info": {
+          "package_name": "com.hobarb.fileupload"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1091656542476-foh8jdm0juv5g545s91ho3mog8gutt0r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4mkl1cvBZ8wXVpw9j59qE3Q2MhC6OyHI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1091656542476-foh8jdm0juv5g545s91ho3mog8gutt0r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
