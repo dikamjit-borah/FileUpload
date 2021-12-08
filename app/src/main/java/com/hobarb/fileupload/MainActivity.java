@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -26,6 +27,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.io.FileOutputStream;
 
 public class MainActivity extends AppCompatActivity {
     private static final int PICKFILE_RESULT_CODE = 101;
@@ -102,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openExplorer() {
-        Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
+        Intent chooseFile = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         chooseFile.setType("*/*");
         chooseFile = Intent.createChooser(chooseFile, "Choose a file");
         startActivityForResult(chooseFile, PICKFILE_RESULT_CODE);
@@ -116,14 +118,56 @@ public class MainActivity extends AppCompatActivity {
             return;
         } else {
             Uri uri = data.getData();
-            filePath = getPath(uri);
+
+            if (android.os.Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+                filePath = getPath(uri);
+            }
+            else{
+                filePath = new FileUtils(getApplicationContext()).getPath(uri);
+            }
             tvFileName.setText("" + filePath);
             createFile();
         }
     }
 
+    public String getImagePath(Uri uri){
+        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+        cursor.moveToFirst();
+        String document_id = cursor.getString(0);
+        document_id = document_id.substring(document_id.lastIndexOf(":")+1);
+        cursor.close();
+
+        cursor = getContentResolver().query(
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+        cursor.moveToFirst();
+        String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+        cursor.close();
+
+        return path;
+    }
+
     private void createFile() {
-        file = new File(filePath);
+        String path = Environment.DIRECTORY_PICTURES.toString();
+        File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/Whatever/");
+        String filename = "loka";
+        try {
+            if (!folder.exists()) {
+                folder.mkdirs();
+                System.out.println("Making dirs");
+            }
+            file= new File(folder.getAbsolutePath(), filename);
+            file.createNewFile();
+
+           /* FileOutputStream out = new FileOutputStream(myFile);
+            myBitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+            out.flush();
+            out.close();*/
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public String getPath(Uri uri) {
@@ -165,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == GALLERY_PERMISSION_CODE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-              openExplorer();
+                openExplorer();
             } else {
                 Toast.makeText(getApplicationContext(), "Permission to Gallery was denied", Toast.LENGTH_SHORT);
             }
